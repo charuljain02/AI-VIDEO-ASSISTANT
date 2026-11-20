@@ -1,0 +1,39 @@
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Downloaded audio and videos
+downloads/
+*.wav
+*.mp3
+*.mp4
+
+# Generated audio chunks
+*_chunk_*.wav
+*_sv_*.wav
+
+# Vector database
+chroma_db/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
