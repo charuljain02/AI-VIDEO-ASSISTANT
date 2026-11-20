@@ -46,7 +46,7 @@ cd AI-VIDEO-ASSISTANT
 ### 2. Create a Virtual Environment
 
 ```bash
-python -m venv venv
+uv venv
 ```
 
 Activate the environment:
@@ -64,7 +64,7 @@ source venv/bin/activate
 ### 3. Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 Make sure FFmpeg is installed on your system.
