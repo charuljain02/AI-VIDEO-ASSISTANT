@@ -2,9 +2,6 @@
 import yt_dlp
 from pydub import AudioSegment
 import os
-import static_ffmpeg
-
-static_ffmpeg.add_paths()
 
 DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -12,7 +9,6 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # 1. Download YouTube audio
 def download_youtube_audio(url: str) -> str:
-
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": f"{DOWNLOAD_DIR}/%(title)s.%(ext)s",
@@ -27,7 +23,6 @@ def download_youtube_audio(url: str) -> str:
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
-
         filename = os.path.splitext(
             ydl.prepare_filename(info)
         )[0] + ".wav"
@@ -41,13 +36,11 @@ def download_youtube_audio(url: str) -> str:
         raise ValueError("Downloaded audio file is empty.")
 
     print(f"Downloaded audio: {filename}")
-
     return filename
 
 
 # 2. Convert audio/video to WAV
 def convert_to_wav(input_path: str) -> str:
-
     if not os.path.exists(input_path):
         raise FileNotFoundError(
             f"Input file not found: {input_path}"
@@ -62,7 +55,6 @@ def convert_to_wav(input_path: str) -> str:
     if len(audio) == 0:
         raise ValueError("Input audio has zero duration.")
 
-    # Whisper-compatible audio format
     audio = audio.set_channels(1)
     audio = audio.set_frame_rate(16000)
     audio = audio.set_sample_width(2)
@@ -80,7 +72,6 @@ def convert_to_wav(input_path: str) -> str:
 
 # 3. Split audio into chunks
 def chunk_audio(wav_path: str, chunk_minutes: int = 10) -> list:
-
     if not os.path.exists(wav_path):
         raise FileNotFoundError(
             f"WAV file not found: {wav_path}"
@@ -95,29 +86,19 @@ def chunk_audio(wav_path: str, chunk_minutes: int = 10) -> list:
         raise ValueError("Cannot split empty audio.")
 
     chunk_ms = chunk_minutes * 60 * 1000
-
     chunks = []
 
     for i, start in enumerate(range(0, len(audio), chunk_ms)):
-
         chunk = audio[start:start + chunk_ms]
 
         if len(chunk) == 0:
             continue
 
         chunk_path = f"{wav_path}_chunk_{i}.wav"
-
         chunk.export(chunk_path, format="wav")
 
-        if not os.path.exists(chunk_path):
-            raise RuntimeError(
-                f"Failed to create chunk {i}"
-            )
-
-        if os.path.getsize(chunk_path) <= 44:
-            raise ValueError(
-                f"Chunk {i} contains no usable audio."
-            )
+        if not os.path.exists(chunk_path) or os.path.getsize(chunk_path) <= 44:
+            raise ValueError(f"Failed to create usable chunk {i}")
 
         chunks.append(chunk_path)
 
@@ -130,13 +111,11 @@ def chunk_audio(wav_path: str, chunk_minutes: int = 10) -> list:
         raise ValueError("No audio chunks were generated.")
 
     print(f"Total chunks created: {len(chunks)}")
-
     return chunks
 
 
 # 4. Main processing function
 def process_input(input_source: str, is_youtube: bool = True):
-
     if not input_source:
         raise ValueError("Please provide an input source.")
 
@@ -146,9 +125,7 @@ def process_input(input_source: str, is_youtube: bool = True):
         audio_path = input_source
 
     wav_path = convert_to_wav(audio_path)
-
     chunks = chunk_audio(wav_path)
 
     print("Audio processing completed successfully.")
-
     return chunks
